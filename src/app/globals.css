@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #FBFBFA;
+    color: #111111;
+    font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: #E1F3FE;
+    color: #1F6C9F;
+  }
+}
+
+/* Utilitários Minimalistas Sem Efeitos Artificiais */
+.editorial-border {
+  border: 1px solid #EAEAEA;
+}
+
+.editorial-divider {
+  border-bottom: 1px solid #EAEAEA;
+}
+
+.editorial-serif {
+  font-family: var(--font-newsreader), 'Newsreader', 'Instrument Serif', Georgia, serif;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.editorial-mono {
+  font-family: var(--font-geist-mono), 'JetBrains Mono', monospace;
+}
+
+.editorial-btn {
+  background-color: #111111;
+  color: #FFFFFF;
+  border-radius: 6px;
+  transition: all 0.15s ease-in-out;
+}
+
+.editorial-btn:hover {
+  background-color: #2F3437;
+}
+
+.editorial-btn:active {
+  transform: scale(0.98);
+}

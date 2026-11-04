@@ -1,0 +1,49 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model SearchJob {
+  id          String    @id @default(uuid())
+  niche       String
+  location    String
+  totalFound  Int       @default(0)
+  isPaid      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  leads       Lead[]
+  payments    Payment[]
+}
+
+model Lead {
+  id          String    @id @default(uuid())
+  searchJobId String
+  searchJob   SearchJob @relation(fields: [searchJobId], references: [id], onDelete: Cascade)
+  name        String
+  category    String?
+  phone       String?
+  whatsappUrl String?
+  address     String?
+  website     String?
+  rating      Float?
+  reviewCount Int?
+  createdAt   DateTime  @default(now())
+}
+
+model Payment {
+  id            String    @id @default(uuid())
+  searchJobId   String
+  searchJob     SearchJob @relation(fields: [searchJobId], references: [id], onDelete: Cascade)
+  mpPaymentId   String?   @unique
+  status        String    @default("pending") // pending, approved, cancelled
+  amount        Float     @default(19.90)
+  qrCode        String?
+  qrCodeBase64  String?
+  ticketUrl     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
