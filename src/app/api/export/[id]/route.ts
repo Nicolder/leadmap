@@ -29,41 +29,61 @@ export async function GET(
       );
     }
 
-    // Formata os dados para a planilha conforme Contrato R5 e PROJECT.md
-    const rows = job.leads.map((l, index) => ({
-      '#': index + 1,
-      'Nome do Negócio': l.name,
-      'Categoria': l.category || job.niche,
-      'Endereço': l.address || 'Não informado',
-      'Cidade': job.location,
-      'Telefone': l.phone || 'Não informado',
-      'Link WhatsApp': l.whatsappUrl || '',
-      'Website': l.website || 'Sem site cadastrado',
-      'Nota Google': l.rating !== null && l.rating !== undefined ? l.rating : '-',
-      'Avaliações': l.reviewCount !== null && l.reviewCount !== undefined ? l.reviewCount : 0,
-    }));
+    // 1. Estruturação profissional e limpa dos dados para o time comercial
+    const rows = job.leads.map((l, index) => {
+      // Separa endereço e bairro de forma mais amigável
+      const addressParts = (l.address || '').split('-');
+      const logradouro = addressParts[0]?.trim() || l.address || 'Não informado';
+      const bairro = addressParts[1]?.split(',')[0]?.trim() || '-';
 
-    // Cria o workbook e a worksheet
+      return {
+        '#': index + 1,
+        'Empresa': l.name,
+        'Telefone': l.phone || 'Não informado',
+        'Link WhatsApp': l.whatsappUrl
+          ? { f: `HYPERLINK("${l.whatsappUrl}", "Chamar no WhatsApp")`, v: 'Chamar no WhatsApp' }
+          : '-',
+        'Categoria': l.category || job.niche,
+        'Logradouro': logradouro,
+        'Bairro': bairro,
+        'Cidade / UF': job.location,
+        'Website': l.website && l.website.startsWith('http')
+          ? { f: `HYPERLINK("${l.website}", "Acessar Site")`, v: 'Acessar Site' }
+          : 'Sem site',
+        'Nota Google': l.rating !== null && l.rating !== undefined ? Number(l.rating) : '-',
+        'Avaliações': l.reviewCount !== null && l.reviewCount !== undefined ? Number(l.reviewCount) : 0,
+      };
+    });
+
+    // 2. Criação da planilha com SheetJS
     const worksheet = XLSX.utils.json_to_sheet(rows);
 
-    // Ajusta a largura das colunas para legibilidade
+    // 3. Ajuste inteligente e generoso da largura das colunas (evita texto cortado ou ###)
     worksheet['!cols'] = [
-      { wch: 5 },  // #
-      { wch: 35 }, // Nome do Negócio
-      { wch: 22 }, // Categoria
-      { wch: 40 }, // Endereço
-      { wch: 20 }, // Cidade
+      { wch: 6 },  // #
+      { wch: 38 }, // Empresa
       { wch: 18 }, // Telefone
-      { wch: 45 }, // Link WhatsApp
-      { wch: 28 }, // Website
-      { wch: 12 }, // Nota Google
-      { wch: 12 }, // Avaliações
+      { wch: 24 }, // Link WhatsApp
+      { wch: 26 }, // Categoria
+      { wch: 36 }, // Logradouro
+      { wch: 22 }, // Bairro
+      { wch: 22 }, // Cidade / UF
+      { wch: 18 }, // Website
+      { wch: 14 }, // Nota Google
+      { wch: 14 }, // Avaliações
     ];
 
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Leads Extraídos');
+    // 4. Habilita filtros automáticos do Excel na primeira linha (AutoFilter)
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:K1');
+    worksheet['!autofilter'] = { ref: `A1:K${range.e.r + 1}` };
 
-    // Gera o buffer binário
+    // 5. Congela a primeira linha (cabeçalho sempre visível ao rolar para baixo)
+    worksheet['!views'] = [{ state: 'frozen', ySplit: 1, xSplit: 0, activeCell: 'A2' }];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Leads Qualificados');
+
+    // 6. Geração do arquivo binário .xlsx
     const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
     const safeNiche = job.niche.toLowerCase().replace(/[^a-z0-9]/g, '_');
@@ -86,4 +106,3 @@ export async function GET(
     );
   }
 }
-
