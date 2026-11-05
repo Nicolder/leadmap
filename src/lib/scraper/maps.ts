@@ -167,7 +167,7 @@ async function fetchOsmNominatimPlaces(
     const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&addressdetails=1&extratags=1&limit=40`;
     const res = await fetch(url, {
       headers: {
-        'User-Agent': 'LeadMapPro/1.0 (contact@leadmap.com.br)',
+        'User-Agent': 'RastroB2B/1.0 (contato@rastro.com.br)',
         'Accept-Language': 'pt-BR,pt;q=0.9',
       },
       signal: AbortSignal.timeout(4000),

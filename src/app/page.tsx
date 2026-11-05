@@ -32,7 +32,7 @@ export default function HomePage() {
           </h1>
 
           <p className="text-base md:text-lg text-[#787774] leading-relaxed mb-10 max-w-2xl">
-            Pare de copiar contato por contato na mão. O LeadMap extrai nome, telefone comercial, link direto de WhatsApp, endereço e avaliação de empresas locais pronto para prospecção ativa e exportação em Excel.
+            Pare de copiar contato por contato na mão. O Rastro extrai nome, telefone comercial, link direto de WhatsApp, endereço e avaliação de empresas locais pronto para prospecção ativa e exportação em Excel.
           </p>
 
           {/* Barra de Busca Principal */}
@@ -114,7 +114,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. Bento Box: Por que usar o LeadMap */}
+      {/* 3. Bento Box: Por que usar o Rastro */}
       <section id="como-funciona" className="py-16 px-6 max-w-5xl mx-auto border-t border-[#EAEAEA]">
         <div className="mb-10">
           <span className="text-[10px] uppercase font-mono tracking-widest px-2 py-0.5 rounded-full bg-[#F7F6F3] text-[#787774]">

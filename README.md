@@ -1,4 +1,4 @@
-# LeadMap — Prospecção B2B de Empresas Locais
+# Rastro — Prospecção B2B de Empresas Locais
 
 Micro-SaaS para busca e extração de dados públicos de empresas locais no Brasil com link de WhatsApp, integração com PIX (Mercado Pago), banco PostgreSQL gerenciado no Neon e exportação direta em planilha Excel (.xlsx).
 

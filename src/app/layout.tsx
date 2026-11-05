@@ -24,7 +24,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'LeadMap — Prospecção B2B de Empresas Locais',
+  title: 'Rastro — Prospecção B2B de Empresas Locais',
   description:
     'Extraia listas comerciais com telefone, WhatsApp, endereço e avaliações do Google Maps em qualquer cidade do Brasil. Baixe direto no Excel.',
 };
@@ -68,10 +68,10 @@ export default function RootLayout({
           <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3 group">
               <span className="w-7 h-7 bg-[#111111] text-white flex items-center justify-center rounded-[5px] text-xs font-mono font-medium">
-                LM
+                R
               </span>
               <span className="font-serif text-xl tracking-tight text-[#111111] font-medium">
-                LeadMap
+                Rastro
               </span>
               <span className="text-[10px] uppercase font-mono tracking-widest px-2 py-0.5 rounded-full bg-[#EDF3EC] text-[#346538]">
                 B2B Brasil
@@ -102,7 +102,7 @@ export default function RootLayout({
         <footer className="border-t border-[#EAEAEA] bg-white mt-24 py-12">
           <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-[#787774]">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[#111111]">LeadMap</span>
+              <span className="font-mono text-[#111111]">Rastro</span>
               <span>—</span>
               <span>Ferramenta de prospecção e extração de dados públicos B2B.</span>
             </div>

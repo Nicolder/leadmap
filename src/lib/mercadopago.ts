@@ -76,7 +76,7 @@ export async function createPixPayment(input: CreatePixInput): Promise<PixPaymen
   // Modo Simulado (Sandbox Local / Demonstração)
   // Gera uma chave PIX Copia-e-Cola válida em formato padrão BACEN
   const simulatedId = `sim_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-  const simulatedPixCode = `00020126580014br.gov.bcb.pix0136${simulatedId}5204000053039865405${amount.toFixed(2)}5802BR5915LEADMAP SERVICO6009SAO PAULO62070503***6304`;
+  const simulatedPixCode = `00020126580014br.gov.bcb.pix0136${simulatedId}5204000053039865405${amount.toFixed(2)}5802BR5914RASTRO SERVICO6009SAO PAULO62070503***6304`;
   
   // Imagem QR Code SVG em base64 minimalista e elegante
   const qrSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="200" height="200"><rect width="100" height="100" fill="#ffffff"/><path d="M10 10h30v30h-30z M60 10h30v30h-30z M10 60h30v30h-30z M20 20h10v10h-10z M70 20h10v10h-10z M20 70h10v10h-10z M50 10h5v15h-5z M10 45h80v5h-80z M55 55h15v10h-15z M75 65h15v25h-15z M50 75h10v15h-10z" fill="#111111"/></svg>`;

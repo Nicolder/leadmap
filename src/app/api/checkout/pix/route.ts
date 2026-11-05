@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     const pixResult = await createPixPayment({
       searchJobId: job.id,
       amount,
-      email: email || 'cliente@leadmap.com.br',
+      email: email || 'cliente@rastro.com.br',
       description: `Lista completa de leads: ${job.niche} em ${job.location}`,
     });
 
