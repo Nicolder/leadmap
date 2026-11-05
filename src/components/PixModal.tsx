@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CheckIcon, CopyIcon, Cross2Icon, UpdateIcon } from '@radix-ui/react-icons';
 
 interface PixModalProps {
@@ -17,6 +17,7 @@ export function PixModal({
   onPaymentApproved,
 }: PixModalProps) {
   const [loading, setLoading] = useState(false);
+  const [isSimulating, setIsSimulating] = useState(false);
   const [paymentData, setPaymentData] = useState<{
     paymentId: string;
     qrCode: string;
@@ -29,13 +30,24 @@ export function PixModal({
   const [isPaid, setIsPaid] = useState(false);
   const [pollingStatus, setPollingStatus] = useState<string>('Aguardando transferência...');
 
-  // 1. Gera a cobrança PIX ao abrir o modal
+  // Mantém referência estável para não re-disparar useEffects desnecessariamente
+  const onPaymentApprovedRef = useRef(onPaymentApproved);
   useEffect(() => {
-    if (!isOpen || !searchJobId) return;
+    onPaymentApprovedRef.current = onPaymentApproved;
+  }, [onPaymentApproved]);
+
+  const hasNotifiedRef = useRef(false);
+
+  // 1. Gera ou recupera a cobrança PIX ao abrir o modal
+  useEffect(() => {
+    if (!isOpen) {
+      hasNotifiedRef.current = false;
+      return;
+    }
+    if (!searchJobId) return;
 
     let isMounted = true;
     setLoading(true);
-    setIsPaid(false);
 
     fetch('/api/checkout/pix', {
       method: 'POST',
@@ -47,7 +59,10 @@ export function PixModal({
         if (!isMounted) return;
         if (data.isPaid) {
           setIsPaid(true);
-          onPaymentApproved();
+          if (!hasNotifiedRef.current) {
+            hasNotifiedRef.current = true;
+            onPaymentApprovedRef.current();
+          }
         } else if (data.paymentId) {
           setPaymentData(data);
         }
@@ -60,9 +75,9 @@ export function PixModal({
     return () => {
       isMounted = false;
     };
-  }, [isOpen, searchJobId, onPaymentApproved]);
+  }, [isOpen, searchJobId]);
 
-  // 2. Polling para verificar se o pagamento foi aprovado
+  // 2. Polling periódico para verificar aprovação automática
   useEffect(() => {
     if (!paymentData?.paymentId || isPaid || !isOpen) return;
 
@@ -75,15 +90,18 @@ export function PixModal({
           setIsPaid(true);
           setPollingStatus('Pagamento aprovado com sucesso!');
           clearInterval(interval);
-          onPaymentApproved();
+          if (!hasNotifiedRef.current) {
+            hasNotifiedRef.current = true;
+            onPaymentApprovedRef.current();
+          }
         }
       } catch (e) {
-        console.warn('Erro no pooling de status:', e);
+        console.warn('Erro no polling de status:', e);
       }
     }, 2500);
 
     return () => clearInterval(interval);
-  }, [paymentData, isPaid, isOpen, onPaymentApproved]);
+  }, [paymentData?.paymentId, isPaid, isOpen]);
 
   const handleCopy = () => {
     if (!paymentData?.qrCode) return;
@@ -93,17 +111,23 @@ export function PixModal({
   };
 
   const handleSimulatePayment = async () => {
-    if (!paymentData?.paymentId) return;
+    if (!paymentData?.paymentId || isSimulating) return;
+    setIsSimulating(true);
     try {
       const res = await fetch(`/api/checkout/status/${paymentData.paymentId}?simulateApprove=true`);
       const data = await res.json();
-      if (data.status === 'approved') {
+      if (data.status === 'approved' || data.isPaid) {
         setIsPaid(true);
         setPollingStatus('Pagamento de teste confirmado!');
-        onPaymentApproved();
+        if (!hasNotifiedRef.current) {
+          hasNotifiedRef.current = true;
+          onPaymentApprovedRef.current();
+        }
       }
     } catch (e) {
       console.error('Erro ao simular aprovação:', e);
+    } finally {
+      setIsSimulating(false);
     }
   };
 
@@ -111,7 +135,7 @@ export function PixModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white border border-[#EAEAEA] rounded-[8px] w-full max-w-md p-6 relative">
+      <div className="bg-white border border-[#EAEAEA] rounded-[8px] w-full max-w-md p-6 relative shadow-sm">
         {/* Botão Fechar */}
         <button
           onClick={onClose}
@@ -139,7 +163,7 @@ export function PixModal({
               <div className="py-12 flex flex-col items-center justify-center gap-3">
                 <UpdateIcon className="w-5 h-5 animate-spin text-[#111111]" />
                 <span className="text-xs text-[#787774] font-mono">
-                  Gerando cobrança no Mercado Pago...
+                  Gerando cobrança PIX...
                 </span>
               </div>
             ) : paymentData ? (
@@ -159,7 +183,6 @@ export function PixModal({
                       alt="QR Code PIX"
                       className="w-48 h-48 object-contain"
                       onError={(e) => {
-                        // Fallback defensivo caso detecção falhe
                         const target = e.target as HTMLImageElement;
                         if (!target.src.includes('svg+xml')) {
                           target.src = `data:image/svg+xml;base64,${paymentData.qrCodeBase64}`;
@@ -214,13 +237,14 @@ export function PixModal({
                     {pollingStatus}
                   </span>
 
-                  {/* Atalho de teste para demonstração local */}
+                  {/* Atalho de teste para demonstração */}
                   <button
                     onClick={handleSimulatePayment}
-                    className="text-[11px] font-mono text-[#1F6C9F] hover:underline"
-                    title="Simula o webhook de aprovação para testar o download"
+                    disabled={isSimulating}
+                    className="text-[11px] font-mono text-[#1F6C9F] hover:underline disabled:opacity-50"
+                    title="Simula a aprovação imediata do PIX para teste"
                   >
-                    [Simular Aprovação]
+                    {isSimulating ? '[Processando...]' : '[Simular Aprovação]'}
                   </button>
                 </div>
               </div>

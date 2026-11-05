@@ -42,21 +42,21 @@ export default function SearchResultsPage({
 }) {
   const { id } = use(params);
 
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [job, setJob] = useState<JobData | null>(null);
   const [sampleLeads, setSampleLeads] = useState<LeadItem[]>([]);
   const [lockedLeads, setLockedLeads] = useState<LeadItem[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (isInitial = false) => {
     try {
-      setLoading(true);
+      if (isInitial) setInitialLoading(true);
       const res = await fetch(`/api/search/${id}`);
       if (!res.ok) throw new Error('Falha ao carregar busca');
       const data = await res.json();
 
       setJob(data.job);
-      if (data.job.isPaid) {
+      if (data.job?.isPaid) {
         setSampleLeads(data.leads || []);
         setLockedLeads([]);
       } else {
@@ -66,15 +66,20 @@ export default function SearchResultsPage({
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
+      if (isInitial) setInitialLoading(false);
     }
   }, [id]);
 
   useEffect(() => {
-    fetchData();
+    fetchData(true);
   }, [fetchData]);
 
-  if (loading) {
+  const handlePaymentApproved = useCallback(() => {
+    // Atualização em background sem desmontar o modal nem a tela
+    fetchData(false);
+  }, [fetchData]);
+
+  if (initialLoading && !job) {
     return (
       <div className="py-24 max-w-5xl mx-auto px-6 flex flex-col items-center justify-center gap-3">
         <UpdateIcon className="w-5 h-5 animate-spin text-[#111111]" />
@@ -282,9 +287,7 @@ export default function SearchResultsPage({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         searchJobId={job.id}
-        onPaymentApproved={() => {
-          fetchData();
-        }}
+        onPaymentApproved={handlePaymentApproved}
       />
     </div>
   );
