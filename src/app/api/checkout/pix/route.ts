@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { createPixPayment } from '@/lib/mercadopago';
+import { scrapeLocalLeads } from '@/lib/scraper/maps';
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,6 +25,27 @@ export async function POST(req: NextRequest) {
         message: 'Esta lista já foi desbloqueada.',
         isPaid: true,
       });
+    }
+
+    if (job.totalFound <= 0) {
+      // Se totalFound está zerado (ex: mock em testes ou job não indexado), tenta recuperar contatos reais
+      const verifiedLeads = await scrapeLocalLeads({
+        niche: job.niche,
+        location: job.location,
+      });
+
+      if (verifiedLeads.length > 0) {
+        job.totalFound = verifiedLeads.length;
+        await db.searchJob.update({
+          where: { id: job.id },
+          data: { totalFound: verifiedLeads.length },
+        });
+      } else {
+        return NextResponse.json(
+          { error: 'Não é possível cobrar por uma lista sem contatos.' },
+          { status: 400 }
+        );
+      }
     }
 
     const amount = 19.90;

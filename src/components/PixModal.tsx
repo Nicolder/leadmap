@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { CheckIcon, CopyIcon, Cross2Icon, UpdateIcon } from '@radix-ui/react-icons';
+import { CheckIcon, CopyIcon, Cross2Icon, Link2Icon, UpdateIcon } from '@radix-ui/react-icons';
 
 interface PixModalProps {
   isOpen: boolean;
@@ -29,6 +29,7 @@ export function PixModal({
   } | null>(null);
 
   const [copied, setCopied] = useState(false);
+  const [copiedPermanentLink, setCopiedPermanentLink] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
   const [pollingStatus, setPollingStatus] = useState<string>('Aguardando transferência...');
 
@@ -105,11 +106,60 @@ export function PixModal({
     return () => clearInterval(interval);
   }, [paymentData?.paymentId, isPaid, isOpen]);
 
-  const handleCopy = () => {
+  const copyTextToClipboard = async (text: string): Promise<boolean> => {
+    if (typeof window === 'undefined') return false;
+    if (navigator?.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (err) {
+        console.warn('Clipboard writeText failed, using fallback:', err);
+      }
+    }
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.top = '0';
+      textArea.style.left = '0';
+      textArea.style.width = '2em';
+      textArea.style.height = '2em';
+      textArea.style.padding = '0';
+      textArea.style.border = 'none';
+      textArea.style.outline = 'none';
+      textArea.style.boxShadow = 'none';
+      textArea.style.background = 'transparent';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      return successful;
+    } catch (err) {
+      console.error('Fallback clipboard copy failed:', err);
+      return false;
+    }
+  };
+
+  const handleCopy = async () => {
     if (!paymentData?.qrCode) return;
-    navigator.clipboard.writeText(paymentData.qrCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+    const ok = await copyTextToClipboard(paymentData.qrCode);
+    if (ok) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
+  };
+
+  const handleCopyPermanentLink = async () => {
+    const url = typeof window !== 'undefined'
+      ? `${window.location.origin}/busca/${searchJobId}`
+      : `/busca/${searchJobId}`;
+    const ok = await copyTextToClipboard(url);
+    if (ok) {
+      setCopiedPermanentLink(true);
+      setTimeout(() => setCopiedPermanentLink(false), 2500);
+    }
   };
 
   const handleSimulatePayment = async () => {
@@ -267,16 +317,39 @@ export function PixModal({
               </p>
             </div>
 
-            <div className="pt-4 flex flex-col gap-2">
+            <div className="pt-4 flex flex-col gap-2.5">
               <a
                 href={`/api/export/${searchJobId}`}
                 className="w-full bg-[#111111] text-white py-2.5 rounded-[6px] text-xs font-medium hover:bg-[#2F3437] transition-all active:scale-[0.98] flex items-center justify-center gap-2"
               >
                 <span>Baixar Planilha Excel {totalFound ? `(${totalFound} Leads)` : '(.xlsx)'}</span>
               </a>
+
+              <button
+                type="button"
+                onClick={handleCopyPermanentLink}
+                className="w-full border border-[#EAEAEA] bg-[#FBFBFA] hover:bg-white hover:border-[#111111] text-[#111111] py-2.5 rounded-[6px] text-xs font-mono transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+              >
+                {copiedPermanentLink ? (
+                  <>
+                    <CheckIcon className="w-4 h-4 text-[#346538]" />
+                    <span className="text-[#346538]">Link permanente copiado!</span>
+                  </>
+                ) : (
+                  <>
+                    <Link2Icon className="w-4 h-4 text-[#787774]" />
+                    <span>Copiar link permanente desta lista</span>
+                  </>
+                )}
+              </button>
+
+              <p className="text-[11px] text-[#787774] font-mono leading-relaxed">
+                Salve o link nos favoritos para consultar ou baixar esta lista quando quiser.
+              </p>
+
               <button
                 onClick={onClose}
-                className="text-xs text-[#787774] hover:text-[#111111] py-1"
+                className="text-xs text-[#787774] hover:text-[#111111] py-1 transition-colors"
               >
                 Continuar visualizando na tela
               </button>

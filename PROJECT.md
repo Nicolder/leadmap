@@ -26,6 +26,13 @@ LeadMap is a Next.js (App Router, React 19, TypeScript) application with Tailwin
 | 11 | Excel Export (.xlsx) | Export all leads to .xlsx with columns: Nome do Negócio, Categoria, Endereço, Cidade, Telefone, Website, etc. | M3 (DONE) | ORIGINAL_REQUEST § R5 |
 | 12 | Payment Gate for Export | Strict HTTP 403 Forbidden on `/api/export/[id]` if `isPaid` is false | M3 (DONE) | ORIGINAL_REQUEST § R5 |
 | 13 | E2E Requirement-Driven Testing | Full opaque-box test suite covering Tiers 1-4 and Tier 5 adversarial tests | M-TEST (DONE) / M4 | Project Pattern |
+| 14 | Visual Identity & Favicon | Create `src/app/icon.svg` with minimalist black and white "R" monogram vector SVG matching brand header | M5 (DONE) | ORIGINAL_REQUEST § R1 |
+| 15 | OpenGraph & SEO Metatags | Configure complete OpenGraph, Twitter, metadataBase, and icons metadata in `src/app/layout.tsx` | M5 (DONE) | ORIGINAL_REQUEST § R1 |
+| 16 | Honest Zero Leads Screen | In `src/app/busca/[id]/page.tsx`, if `job.totalFound === 0`, display clean zero-state view with broader suggestions and embedded search bar | M5 (DONE) | ORIGINAL_REQUEST § R2 |
+| 17 | Zero-State Purchase Protection | In `src/app/busca/[id]/page.tsx` and `/api/checkout/pix`, disable/hide purchase buttons for 0 leads and return 400 on backend | M5 (DONE) | ORIGINAL_REQUEST § R2 |
+| 18 | Permanent Link Recovery Button | Add "Copiar link permanente desta lista" button on `/busca/[id]` with visual feedback ("Link copiado!") | M5 (DONE) | ORIGINAL_REQUEST § R3 |
+| 19 | Permanent Link in PixModal | Add "Copiar link permanente desta lista" button in PixModal payment success state with feedback ("Link permanente copiado!") | M5 (DONE) | ORIGINAL_REQUEST § R3 |
+| 20 | Instant Leads Table Filtering | Dynamic real-time filter toolbar above leads table in `/busca/[id]` filtering by name, category, and neighborhood (bairro) with live count | M5 (DONE) | ORIGINAL_REQUEST § R4 |
 
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
@@ -35,6 +42,7 @@ LeadMap is a Next.js (App Router, React 19, TypeScript) application with Tailwin
 | M2 | Overpass Search Engine & Leads Preview | Overpass API integration, 3-tier fallback, DDD resolution, phone formatting, 5 leads preview & blur | M1 | DONE |
 | M3 | Checkout PIX & Excel Export | Mercado Pago PIX R$ 19,90, placeholder fallback, Cidade column in .xlsx export, 403 gate | M1 | DONE |
 | M4 | Final E2E Pass & Adversarial Hardening | 100% pass of E2E tests (Tiers 1-4), Tier 5 adversarial hardening, production build verification | M1, M2, M3, M-TEST | DONE |
+| M5 | Production Readiness Improvements | R1 (icon.svg, metadata in layout.tsx), R2 (zero leads UI & backend protection), R3 (permanent link on busca & PixModal), R4 (instant table filtering) | M1-M4 | DONE |
 
 ## Interface Contracts
 ### Frontend ↔ Search API (`/api/search`, `/api/search/[id]`)
@@ -68,6 +76,7 @@ src/
 │   │   └── webhooks/mercadopago/route.ts
 │   ├── busca/[id]/page.tsx
 │   ├── globals.css
+│   ├── icon.svg
 │   ├── layout.tsx
 │   └── page.tsx
 ├── components/

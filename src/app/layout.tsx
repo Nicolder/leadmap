@@ -24,9 +24,55 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Rastro — Prospecção B2B de Empresas Locais',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://rastro.app'),
+  title: {
+    default: 'Rastro — Prospecção B2B de Empresas Locais',
+    template: '%s | Rastro',
+  },
   description:
     'Extraia listas comerciais com telefone, WhatsApp, endereço e avaliações do Google Maps em qualquer cidade do Brasil. Baixe direto no Excel.',
+  applicationName: 'Rastro',
+  authors: [{ name: 'Rastro' }],
+  creator: 'Rastro',
+  publisher: 'Rastro',
+  keywords: [
+    'prospecção b2b',
+    'leads locais',
+    'google maps',
+    'listas comerciais',
+    'empresas brasil',
+    'whatsapp empresas',
+    'extração de contatos',
+    'prospecção ativa',
+    'planilha excel',
+  ],
+  openGraph: {
+    type: 'website',
+    locale: 'pt_BR',
+    url: '/',
+    siteName: 'Rastro',
+    title: 'Rastro — Prospecção B2B de Empresas Locais',
+    description:
+      'Extraia listas comerciais com telefone, WhatsApp, endereço e avaliações do Google Maps em qualquer cidade do Brasil. Baixe direto no Excel.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Rastro — Prospecção B2B de Empresas Locais',
+    description:
+      'Extraia listas comerciais com telefone, WhatsApp, endereço e avaliações do Google Maps em qualquer cidade do Brasil. Baixe direto no Excel.',
+  },
+  icons: {
+    icon: [
+      {
+        url: '/icon.svg',
+        type: 'image/svg+xml',
+      },
+    ],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
