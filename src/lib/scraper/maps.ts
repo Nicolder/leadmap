@@ -208,6 +208,44 @@ async function fetchOsmNominatimPlaces(
   }
 }
 
+function getSmartQueryVariants(niche: string, location: string): string[] {
+  const variants = new Set<string>();
+  const cleanNiche = niche.trim();
+  const cleanLoc = location.trim();
+
+  // Busca padrão
+  variants.add(`${cleanNiche} ${cleanLoc}`);
+  variants.add(`${cleanNiche} em ${cleanLoc}`);
+
+  // Variação de sinônimos para maximizar resultados reais do Google Maps
+  const lowerNiche = cleanNiche.toLowerCase();
+  if (lowerNiche.includes('odonto') || lowerNiche.includes('dentis')) {
+    variants.add(`dentista ${cleanLoc}`);
+    variants.add(`odontologia ${cleanLoc}`);
+    variants.add(`consultório odontológico ${cleanLoc}`);
+  } else if (lowerNiche.includes('barbearia') || lowerNiche.includes('barbeiro')) {
+    variants.add(`barbearia ${cleanLoc}`);
+    variants.add(`salão masculino ${cleanLoc}`);
+  } else if (lowerNiche.includes('academia') || lowerNiche.includes('fitness')) {
+    variants.add(`academia ${cleanLoc}`);
+    variants.add(`centro de treinamento ${cleanLoc}`);
+  } else if (lowerNiche.includes('restaurante') || lowerNiche.includes('lanchonete')) {
+    variants.add(`restaurante ${cleanLoc}`);
+    variants.add(`gastronomia ${cleanLoc}`);
+  } else if (lowerNiche.includes('oficina') || lowerNiche.includes('mecânica') || lowerNiche.includes('mecanica')) {
+    variants.add(`oficina mecânica ${cleanLoc}`);
+    variants.add(`auto center ${cleanLoc}`);
+  } else if (lowerNiche.includes('imobili') || lowerNiche.includes('corretor')) {
+    variants.add(`imobiliária ${cleanLoc}`);
+    variants.add(`corretores de imóveis ${cleanLoc}`);
+  } else if (lowerNiche.includes('contab') || lowerNiche.includes('contador')) {
+    variants.add(`escritório de contabilidade ${cleanLoc}`);
+    variants.add(`contabilidade ${cleanLoc}`);
+  }
+
+  return Array.from(variants);
+}
+
 /**
  * Motor Principal de Extração de Leads 100% REAIS.
  * Consulta o Google Maps em múltiplas variações e unifica os resultados autênticos.
@@ -216,11 +254,8 @@ export async function scrapeLocalLeads(params: SearchParams): Promise<RawLead[]>
   const { niche, location } = params;
   const ddd = getDddForLocation(location);
 
-  // Variações de busca no Google Maps para encontrar o máximo de empresas reais
-  const queryVariants = [
-    `${niche} ${location}`,
-    `${niche} em ${location}`,
-  ];
+  // Variações inteligentes de busca no Google Maps
+  const queryVariants = getSmartQueryVariants(niche, location);
 
   // Executa as consultas ao Google Maps em paralelo
   const googleResults = await Promise.all(

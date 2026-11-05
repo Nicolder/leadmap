@@ -123,12 +123,12 @@ export default function SearchResultsPage({
         {job.isPaid ? (
           <span className="inline-flex items-center gap-1.5 text-xs font-mono bg-[#EDF3EC] text-[#346538] px-3 py-1 rounded-full">
             <CheckCircledIcon className="w-4 h-4" />
-            <span>Lista Completa Desbloqueada</span>
+            <span>Lista Completa Desbloqueada ({job.totalFound} {job.totalFound === 1 ? 'lead' : 'leads'})</span>
           </span>
         ) : (
           <span className="inline-flex items-center gap-1.5 text-xs font-mono bg-[#FBF3DB] text-[#956400] px-3 py-1 rounded-full">
             <LockClosedIcon className="w-3.5 h-3.5" />
-            <span>Amostra de 5 contatos liberados</span>
+            <span>Amostra de {sampleLeads.length} de {job.totalFound} contatos liberada</span>
           </span>
         )}
       </div>
@@ -143,7 +143,7 @@ export default function SearchResultsPage({
             {job.niche} em {job.location}
           </h1>
           <p className="text-xs text-[#787774] font-mono mt-1">
-            Total de {job.totalFound} estabelecimentos mapeados com contatos públicos.
+            Total de {job.totalFound} {job.totalFound === 1 ? 'estabelecimento mapeado' : 'estabelecimentos mapeados'} com contatos públicos.
           </p>
         </div>
 
@@ -154,7 +154,7 @@ export default function SearchResultsPage({
               className="bg-[#111111] text-white px-5 py-2.5 rounded-[6px] text-xs font-medium hover:bg-[#2F3437] transition-all inline-flex items-center gap-2 active:scale-[0.98]"
             >
               <DownloadIcon className="w-4 h-4" />
-              <span>Baixar Planilha Excel (.xlsx)</span>
+              <span>Baixar Planilha Excel ({job.totalFound} Leads)</span>
             </a>
           ) : (
             <button
@@ -269,14 +269,14 @@ export default function SearchResultsPage({
               Desbloqueie os {lockedLeads.length} contatos restantes
             </h3>
             <p className="text-xs text-[#787774] max-w-md mt-1 mb-6">
-              Os 5 primeiros contatos acima foram liberados para você avaliar a qualidade. Pague R$ 19,90 via PIX para liberar todos os telefones, links de WhatsApp e baixar a planilha completa em Excel.
+              Os {sampleLeads.length} primeiros contatos acima foram liberados como amostra real. Pague R$ 19,90 via PIX para liberar todos os {job.totalFound} contatos com telefones, links de WhatsApp e baixar a planilha completa em Excel (.xlsx).
             </p>
             <button
               onClick={() => setIsModalOpen(true)}
               className="bg-[#111111] text-white px-8 py-3 rounded-[6px] text-xs font-medium hover:bg-[#2F3437] transition-all active:scale-[0.98] inline-flex items-center gap-2"
             >
               <DownloadIcon className="w-4 h-4" />
-              <span>Desbloquear Lista Completa (R$ 19,90 no PIX)</span>
+              <span>Desbloquear Lista Completa ({job.totalFound} Leads no PIX)</span>
             </button>
           </div>
         )}
@@ -287,6 +287,7 @@ export default function SearchResultsPage({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         searchJobId={job.id}
+        totalFound={job.totalFound}
         onPaymentApproved={handlePaymentApproved}
       />
     </div>

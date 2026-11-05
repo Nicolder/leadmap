@@ -7,6 +7,7 @@ interface PixModalProps {
   isOpen: boolean;
   onClose: () => void;
   searchJobId: string;
+  totalFound?: number;
   onPaymentApproved: () => void;
 }
 
@@ -14,6 +15,7 @@ export function PixModal({
   isOpen,
   onClose,
   searchJobId,
+  totalFound,
   onPaymentApproved,
 }: PixModalProps) {
   const [loading, setLoading] = useState(false);
@@ -152,10 +154,10 @@ export function PixModal({
                 Checkout PIX Instantâneo
               </span>
               <h3 className="font-serif text-2xl text-[#111111] mt-2 font-medium">
-                Desbloquear Lista Completa
+                Desbloquear Lista Completa {totalFound ? `(${totalFound} Leads)` : ''}
               </h3>
               <p className="text-xs text-[#787774] mt-1">
-                Pague via PIX para liberar o download imediato de todos os contatos em formato Excel (.xlsx).
+                Pague via PIX para liberar o download imediato de todos os {totalFound ? `${totalFound} contatos reais` : 'contatos'} em formato Excel (.xlsx).
               </p>
             </div>
 
@@ -261,7 +263,7 @@ export function PixModal({
                 Pagamento Aprovado!
               </h3>
               <p className="text-xs text-[#787774] mt-1">
-                Sua lista completa foi desbloqueada. Você já pode baixar a planilha com todos os contatos.
+                Sua lista completa com todos os {totalFound ? `${totalFound} contatos reais` : 'contatos'} foi desbloqueada com sucesso.
               </p>
             </div>
 
@@ -270,7 +272,7 @@ export function PixModal({
                 href={`/api/export/${searchJobId}`}
                 className="w-full bg-[#111111] text-white py-2.5 rounded-[6px] text-xs font-medium hover:bg-[#2F3437] transition-all active:scale-[0.98] flex items-center justify-center gap-2"
               >
-                <span>Baixar Planilha Excel (.xlsx)</span>
+                <span>Baixar Planilha Excel {totalFound ? `(${totalFound} Leads)` : '(.xlsx)'}</span>
               </a>
               <button
                 onClick={onClose}
