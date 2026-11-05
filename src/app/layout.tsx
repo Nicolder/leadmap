@@ -23,8 +23,13 @@ const geistMono = Geist_Mono({
   display: 'swap',
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined) ||
+  'https://leadmap-peach.vercel.app';
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://rastro.app'),
+  metadataBase: new URL(siteUrl),
   title: {
     default: 'Rastro — Prospecção B2B de Empresas Locais',
     template: '%s | Rastro',

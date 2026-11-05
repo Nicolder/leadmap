@@ -170,9 +170,12 @@ export default function SearchResultsPage({
   }, [fetchData]);
 
   const handleCopyLink = useCallback(async () => {
-    const url = typeof window !== 'undefined'
-      ? `${window.location.origin}/busca/${id}`
-      : `/busca/${id}`;
+    // Garante que o link copiado aponte sempre para o domínio público oficial e nunca para preview bloqueado da Vercel
+    const origin =
+      typeof window !== 'undefined' && !window.location.hostname.includes('projects.vercel.app')
+        ? window.location.origin
+        : 'https://leadmap-peach.vercel.app';
+    const url = `${origin}/busca/${id}`;
     const success = await copyToClipboard(url);
     if (success) {
       setCopiedLink(true);
