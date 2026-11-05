@@ -35,7 +35,12 @@ export async function createPixPayment(input: CreatePixInput): Promise<PixPaymen
   if (mpClient) {
     try {
       const payment = new Payment(mpClient);
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      const appUrl =
+        process.env.APP_URL ||
+        process.env.NEXT_PUBLIC_APP_URL ||
+        (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined) ||
+        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ||
+        'http://localhost:3000';
       
       const response = await payment.create({
         body: {
