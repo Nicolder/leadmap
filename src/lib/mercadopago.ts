@@ -35,12 +35,17 @@ export async function createPixPayment(input: CreatePixInput): Promise<PixPaymen
   if (mpClient) {
     try {
       const payment = new Payment(mpClient);
-      const appUrl =
+      // O Mercado Pago exige URL HTTPS pública para notification_url em credenciais reais
+      let appUrl =
+        (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined) ||
         process.env.APP_URL ||
         process.env.NEXT_PUBLIC_APP_URL ||
-        (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined) ||
         (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ||
-        'http://localhost:3000';
+        'https://leadmap-peach.vercel.app';
+
+      if (!appUrl.startsWith('https://') || appUrl.includes('localhost')) {
+        appUrl = 'https://leadmap-peach.vercel.app';
+      }
       
       const response = await payment.create({
         body: {
